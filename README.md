@@ -99,3 +99,23 @@ odd :: Int -> Bool
 odd = not . even
 ```
 
+### Week 5: Parsers and Parser Combinators
+For simplicity, we won't use the Maybe type in this lecture; the parser will either fail and return the empty list of results, or succeed.  
+`type Parser a :: String -> [(a,String)]`
+
+A simple parser `item` fails if the input is empty; otherwise, it consumes the first char
+```
+item :: Parser Char
+item = \inp -> case inp of
+                []      -> []
+                (x:xs)  -> [(x,xs)]
+```
+A failure parser:
+```
+failure :: Parser a
+failure = \inp -> []
+```
+### Week 6: Interactive Programs
+IO type functions specify actions, whereas pure functions are expressions.
+
+In this week's lectures, we implement a Hangman game to demonstrate taking user input and printint output in an interactive program.
