@@ -119,3 +119,33 @@ failure = \inp -> []
 IO type functions specify actions, whereas pure functions are expressions.
 
 In this week's lectures, we implement a Hangman game to demonstrate taking user input and printint output in an interactive program.
+
+### Week 7: Types and Classes
+We can define aliases for existing types using the `type` keyword:
+```
+type String = [Char]
+type Pair a = (a,a)
+type Pos = (Int,Int)
+```
+Data declarations specify a completely new type:
+```
+data Bool = False | True
+```
+These are often referred to as `Algebraic Data Types`.  The two values False and True are called the `constructors` for the type `Bool`.
+
+We can look at these as context free grammars.
+```
+-- Declares a new algebraic data type
+data Answer = Yes | No | Unknown
+
+-- Creates a list of answers
+answers :: [Answer]
+answers = [Yes, No, Unknown]
+
+-- Function operating on answers
+flip :: Answer -> Answer
+flip Yes = No
+flip No = yes
+flip Unknown = Unknown
+```
+
