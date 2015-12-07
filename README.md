@@ -121,7 +121,7 @@ IO type functions specify actions, whereas pure functions are expressions.
 In this week's lectures, we implement a Hangman game to demonstrate taking user input and printint output in an interactive program.
 
 ### Week 7: Types and Classes
-We can define aliases for existing types using the `type` keyword:
+We can define aliases for existing types using the `type` keyword.  These are simple type declarations:
 ```
 type String = [Char]
 type Pair a = (a,a)
@@ -149,3 +149,61 @@ flip No = yes
 flip Unknown = Unknown
 ```
 
+#### Recursive Types
+Consider the church numerals:  
+`data Nat = Zero | Succ Nat`. It has a constructor `Zero :: Nat` and `Succ :: Nat -> Nat`
+
+With a helper function, we can define the isomorphism between Nat data and natural numbers:
+```
+nat2int :: Nat -> Int
+nat2int Zero = 0
+nat2int (Succ n) = 1 + nat2int n
+
+int2nat :: Int -> Nat
+int2nat 0 = Zero
+int2nat n = Succ (int2nat (n-1))
+```
+
+Playing with this further, we can define:
+```
+add Zero n = n
+add (Succ m) n = Succ (add m n)
+```
+
+#### Arithmetic Expressions
+```
+data Expr = Val Int
+          | Add Expr Expr
+          | Mul Expr Expr
+
+-- Count how many values appear in an expression
+size :: Expr -> Int
+size (Val n) = 1
+size (Add x y) = size x + size y
+size (Mul x y) = size x + size y
+
+-- Evaluate an expression
+eval :: Expr -> Int
+eval (Val n) = n
+eval (Add x y) = eval x + eval y
+eval (Mul x y) = eval x * eval y
+
+-- We can also replace the above expression with a fold
+eval = fold id (+) (*)
+```
+#### Binary Trees
+```
+data Tree = Leaf Int
+          | Node Tree Int Tree
+
+occurs :: Int -> Tree -> Bool
+occurs m (Left n) = m == n
+occurs m (Node l n r) = m == n
+                        || occurs m l
+                        || occurs m r
+
+-- Convert a tree into an list from an in-order traversal
+flatten :: Tree -> [Int]
+flatten (Left n) = [n]
+flatten (Node l n r) = flatten l ++ [n] ++ flatten r
+```
