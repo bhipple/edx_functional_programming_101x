@@ -207,3 +207,8 @@ flatten :: Tree -> [Int]
 flatten (Left n) = [n]
 flatten (Node l n r) = flatten l ++ [n] ++ flatten r
 ```
+
+### Week 10: The Countdown Problem
+Given a set of integers, a target number, and the arithmetic operators `+, -, *, /`, construct an expression whose value is the target number.
+
+
