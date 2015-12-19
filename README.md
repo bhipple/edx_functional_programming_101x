@@ -211,4 +211,36 @@ flatten (Node l n r) = flatten l ++ [n] ++ flatten r
 ### Week 10: The Countdown Problem
 Given a set of integers, a target number, and the arithmetic operators `+, -, *, /`, construct an expression whose value is the target number.
 
+See `countdown.hs` for exercises on the countdown problem.
 
+### Week 11: Lazy Evaluation
+Consider a fucntion `square n = n * n` and an input `square (3 + 4)`.
+
+We can expand to either one of these results with identical results:
+```
+square (3+4)
+square (7)
+7 * 7
+49
+
+square (3+4)
+(3+4) * (3+4)
+7 * 7
+49
+```
+The first is called applicative order reduction, while the second is called normal order reduction. Normal order results in excess computation!
+
+Consider expressions like `fst (1, last [1..])`.  Normal order works instantly, while applicative order fails to terminate.
+
+Take away points:  
+* Normal order reduction may give a result when applicative order fails to terminate
+* For any given expression, if there exists any reduction sequence that terminates, then normal order reduction also terminates with the same result.
+* Normal order reduction is more likely to terminate
+* Applicative order reduction may be more performant, when it terminates
+
+How Haskell handles this dilemma:  
+Expressions are passed as pointers to thunks. When the thunk is evaluated and someone queries the value a second time, no computation is done.  
+This allows Haskell to do normal order evaluation without the performance hit!  In the above example, the two `(3+4)` computations are both pointing to the same thunk, so the addition only happens once.
+
+#### Generating Primes
+See https://www.cs.hmc.edu/~oneill/papers/Sieve-JFP.pdf
