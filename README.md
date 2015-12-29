@@ -244,3 +244,25 @@ This allows Haskell to do normal order evaluation without the performance hit!  
 
 #### Generating Primes
 See https://www.cs.hmc.edu/~oneill/papers/Sieve-JFP.pdf
+
+### Week 12: Reasoning about Programs
+
+### Week 13
+A `Functor` is a type that defines an operation `fmap :: (a -> b) -> f a -> f b` that allows us to map a function over a structure.
+
+This obeys two laws:
+```
+fmap id = id
+fmap (p . q) = (fmap p) . (fmap q)
+```
+For example, a Tree could implement fmap by applying the function to every node in the tree.
+
+A `monoid` is a typeclass for types that provide an `mappend` function for combining values, and an `mempty` function subject to the following laws:
+```
+-- Associativity
+mappend (mappend x y) z = mappend x (mappend y z)
+
+-- Identity
+mappend x mempty = x
+mappemd mempty x = x
+```

@@ -17,7 +17,7 @@ children (_ :> xs) = xs
 
 xs = 0 :> [1 :> [2 :> [3 :> [4 :> [], 5 :> []]]], 6 :> [], 7 :> [8 :> [9 :> [10 :> []], 11 :> []], 12 :> [13 :> []]]]
 
-ex2 = root . head . children . head . children . head . drop 2 $ children xs
+ex2 = root . head . children . head . children . (!! 2) $ children xs
 
 -- ===================================
 -- Ex. 3-7
@@ -30,15 +30,15 @@ leaves :: Rose a -> Int
 leaves (_ :> []) = 1
 leaves (_ :> xs) = sum . map leaves $ xs
 
-ex7 = (*) (leaves . head . children . head . children $ xs) (product . map size . children . head . drop 2 . children $ xs)
+ex7 = (*) (leaves . head . children . head . children $ xs) (product . map size . children . (!! 2) . children $ xs)
 
 -- ===================================
 -- Ex. 8-10
 -- ===================================
 instance Functor Rose where
-  fmap f (x :> xs) = ((f x) :> fmap (fmap f) xs)
+  fmap f (x :> xs) = f x :> fmap (fmap f) xs
 
-ex10 = round . root . head . children . fmap (\x -> if x > 0.5 then x else 0) $ fmap (\x -> sin(fromIntegral x)) xs
+ex10 = round . root . head . children . fmap (\x -> if x > 0.5 then x else 0) $ fmap (sin . fromIntegral) xs
 
 -- ===================================
 -- Ex. 11-13
@@ -51,12 +51,12 @@ newtype Sum a = Sum a deriving (Show)
 newtype Product a = Product a deriving (Show)
 
 instance Num a => Monoid (Sum a) where
-  mempty = (Sum 0)
-  mappend x y = (Sum (unSum x + unSum y))
+  mempty = Sum 0
+  mappend x y = Sum (unSum x + unSum y)
 
 instance Num a => Monoid (Product a) where
-  mempty = (Product 1)
-  mappend x y = (Product (unProduct x * unProduct y))
+  mempty = Product 1
+  mappend x y = Product (unProduct x * unProduct y)
 
 unSum :: Sum a -> a
 unSum (Sum a) = a
@@ -72,34 +72,44 @@ ex13 = unSum (mappend (Sum 5) (Sum (unProduct (mappend (Product (unSum num2)) (m
 -- ===================================
 -- Ex. 14-15
 -- ===================================
-
 class Functor f => Foldable f where
   fold :: Monoid m => f m -> m
-  foldMap :: Monoid m => (a -> m) -> (f a -> m)
-  foldMap = error "you have to implement foldMap"
+  foldMap :: Monoid m => (a -> m) -> f a -> m
+  foldMap f xs = fold $ fmap f xs
+
+instance Foldable [] where
+    fold = foldr mappend mempty
 
 instance Foldable Rose where
-  fold = error "you have to implement fold for Rose"
+  fold (x :> []) = mappend x mempty
+  fold (x :> xs) = mappend x (fold (fmap fold xs))
+
+t = 1 :> [2 :> [], 3 :> [4 :> []]]
+t' = fmap Product t
+ex14 = unProduct $ fold t'
 
 sumxs = Sum 0 :> [Sum 13 :> [Sum 26 :> [Sum (-31) :> [Sum (-45) :> [], Sum 23 :> []]]], Sum 27 :> [], Sum 9 :> [Sum 15 :> [Sum 3 :> [Sum (-113) :> []], Sum 1 :> []], Sum 71 :> [Sum 55 :> []]]]
 
-ex15 = unSum (mappend (mappend (fold sumxs) (mappend (fold . head . drop 2 . children $ sumxs) (Sum 30))) (fold . head . children $ sumxs))
+ex15 = unSum (mappend (mappend (fold sumxs) (mappend (fold . (!! 2) . children $ sumxs) (Sum 30))) (fold . head . children $ sumxs))
 
 -- ===================================
 -- Ex. 16-18
 -- ===================================
+t16 = 42 :> [3 :> [2:> [], 1 :> [0 :> []]]]
+ex16 = unSum $ foldMap Sum t16
 
-ex17 = unSum (mappend (mappend (foldMap (\x -> Sum x) xs) (mappend (foldMap (\x -> Sum x) . head . drop 2 . children $ xs) (Sum 30))) (foldMap (\x -> Sum x) . head . children $ xs))
+ex17 = unSum (mappend (mappend (foldMap Sum xs) (mappend (foldMap Sum . (!! 2) . children $ xs) (Sum 30))) (foldMap Sum . head . children $ xs))
 
-ex18 = unSum (mappend (mappend (foldMap (\x -> Sum x) xs) (Sum (unProduct (mappend (foldMap (\x -> Product x) . head . drop 2 . children $ xs) (Product 3))))) (foldMap (\x -> Sum x) . head . children $ xs))
+ex18 = unSum (mappend (mappend (foldMap Sum xs) (Sum (unProduct (mappend (foldMap Product . (!! 2) . children $ xs) (Product 3))))) (foldMap Sum . head . children $ xs))
 
 -- ===================================
 -- Ex. 19-21
 -- ===================================
-
 fproduct, fsum :: (Foldable f, Num a) => f a -> a
-fsum = error "you have to implement fsum"
-fproduct = error "you have to implement fproduct"
+fsum xs = unSum $ foldMap Sum xs
+fproduct xs = unProduct $ foldMap Product xs
 
-ex21 = ((fsum . head . drop 1 . children $ xs) + (fproduct . head . children . head . children . head . drop 2 . children $ xs)) - (fsum . head . children . head . children $ xs)
+ex21 = ((fsum . (!! 1) . children $ xs) + (fproduct . head . children . head . children . (!! 2) . children $ xs)) - (fsum . head . children . head . children $ xs)
 
+
+main = putStrLn "Lab 6"
