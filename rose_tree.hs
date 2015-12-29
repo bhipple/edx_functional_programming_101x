@@ -1,18 +1,19 @@
 ------------------------------------------------------------------------------------------------------------------------------
 -- ROSE TREES, FUNCTORS, MONOIDS, FOLDABLES
 ------------------------------------------------------------------------------------------------------------------------------
-
 data Rose a = a :> [Rose a] deriving Show
+
+tree = 1 :> map (\c -> c :> []) [1..5]
 
 -- ===================================
 -- Ex. 0-2
 -- ===================================
-
 root :: Rose a -> a
-root = error "you have to implement root"
+root (r :> _) = r
 
 children :: Rose a -> [Rose a]
-children = error "you have to implement children"
+children (_ :> []) = []
+children (_ :> xs) = xs
 
 xs = 0 :> [1 :> [2 :> [3 :> [4 :> [], 5 :> []]]], 6 :> [], 7 :> [8 :> [9 :> [10 :> []], 11 :> []], 12 :> [13 :> []]]]
 
@@ -21,47 +22,46 @@ ex2 = root . head . children . head . children . head . drop 2 $ children xs
 -- ===================================
 -- Ex. 3-7
 -- ===================================
-
 size :: Rose a -> Int
-size = error "you have to implement size"
+size (_ :> []) = 1
+size (_ :> xs) = 1 + (sum . map size $ xs)
 
 leaves :: Rose a -> Int
-leaves = error "you have to implement leaves"
+leaves (_ :> []) = 1
+leaves (_ :> xs) = sum . map leaves $ xs
 
 ex7 = (*) (leaves . head . children . head . children $ xs) (product . map size . children . head . drop 2 . children $ xs)
 
 -- ===================================
 -- Ex. 8-10
 -- ===================================
-
 instance Functor Rose where
-  fmap = error "you have to implement fmap for Rose"
+  fmap f (x :> xs) = ((f x) :> fmap (fmap f) xs)
 
 ex10 = round . root . head . children . fmap (\x -> if x > 0.5 then x else 0) $ fmap (\x -> sin(fromIntegral x)) xs
 
 -- ===================================
 -- Ex. 11-13
 -- ===================================
-
 class Monoid m where
   mempty :: m
   mappend :: m -> m -> m
 
-newtype Sum a = Sum a
-newtype Product a = Product a
+newtype Sum a = Sum a deriving (Show)
+newtype Product a = Product a deriving (Show)
 
 instance Num a => Monoid (Sum a) where
-  mempty = error "you have to implement mempty for Sum"
-  mappend = error "you have to implement mappend for Sum"
+  mempty = (Sum 0)
+  mappend x y = (Sum (unSum x + unSum y))
 
 instance Num a => Monoid (Product a) where
-  mempty = error "you have to implement mempty for Product"
-  mappend = error "you have to implement mappend for Product"
+  mempty = (Product 1)
+  mappend x y = (Product (unProduct x * unProduct y))
 
 unSum :: Sum a -> a
-unSum = error "you have to implement unSum"
+unSum (Sum a) = a
 unProduct :: Product a -> a
-unProduct = error "you have to implement unProduct"
+unProduct (Product a) = a
 
 num1 = mappend (mappend (Sum 2) (mappend (mappend mempty (Sum 1)) mempty)) (mappend (Sum 2) (Sum 1))
 
