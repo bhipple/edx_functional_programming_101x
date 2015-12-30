@@ -246,6 +246,7 @@ This allows Haskell to do normal order evaluation without the performance hit!  
 See https://www.cs.hmc.edu/~oneill/papers/Sieve-JFP.pdf
 
 ### Week 12: Reasoning about Programs
+Thanks to Haskell's purity, if we have a function `double x = x + x`, we can safely replace instances of `double x` with `x + x` and vice versa when proving properties about equations.
 
 ### Week 13
 A `Functor` is a type that defines an operation `fmap :: (a -> b) -> f a -> f b` that allows us to map a function over a structure.
