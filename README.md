@@ -248,6 +248,10 @@ See https://www.cs.hmc.edu/~oneill/papers/Sieve-JFP.pdf
 ### Week 12: Reasoning about Programs
 Thanks to Haskell's purity, if we have a function `double x = x + x`, we can safely replace instances of `double x` with `x + x` and vice versa when proving properties about equations.
 
+This opens the door to a wide range of optimizations from reductions, similar to the trivial toy examples of `reverse [x] == [x]` and `not not True == True`. Likewise, the recursive nature of many functions lends itself to proofs by induction.
+
+This technique is particularly effective in constructing equivalent functions that eliminate use of the inefficient `++` operator; see the pdf for details.
+
 The induction principle for lists: It is sufficient to show that `p` holds for the empty list `[]`, the base case, and that if `p` holds for any list `xs`, then it also holds for `x : xs` for any element `x`, the inductive case.
 
 ### Week 13
